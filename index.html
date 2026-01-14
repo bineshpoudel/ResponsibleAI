@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Facial Recognition Oversight Dashboard</title>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const { useState } = React;
+
+      // Lucide React icons as inline SVG components
+      const AlertCircle = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+      );
+
+      const CheckCircle = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      );
+
+      const XCircle = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+      );
+
+      const Info = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      );
+
+      const User = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+      );
+
+      const Shield = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+        </svg>
+      );
+
+      const Eye = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      );
+
+      const TrendingUp = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+          <polyline points="17 6 23 6 23 12"></polyline>
+        </svg>
+      );
+
+      const Activity = ({ className, size = 24 }) => (
+        <svg
+          className={className}
+          width={size}
+          height={size}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+      );
+
+      const FRSOversightDashboard = () => {
+        const [selectedMatch, setSelectedMatch] = useState(null);
+        const [userDecision, setUserDecision] = useState(null);
+        const [showExplanation, setShowExplanation] = useState(false);
+        const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+
+        const matches = [
+          {
+            id: 1,
+            confidence: 87,
+            demographic: "Black Female",
+            biasRisk: "High",
+            timestamp: "2026-01-14 10:23:15",
+            requiresReview: true,
+            features: ["facial_structure", "eye_spacing", "nose_bridge"],
+            historicalAccuracy: 68,
+          },
+          {
+            id: 2,
+            confidence: 94,
+            demographic: "White Male",
+            biasRisk: "Low",
+            timestamp: "2026-01-14 10:18:42",
+            requiresReview: false,
+            features: [
+              "facial_structure",
+              "eye_spacing",
+              "jawline",
+              "cheekbones",
+            ],
+            historicalAccuracy: 96,
+          },
+        ];
+
+        const [currentMatch, setCurrentMatch] = useState(matches[0]);
+        const [overrideReason, setOverrideReason] = useState("");
+
+        const BiasMetrics = () => (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-xl font-bold mb-4 flex items-center">
+              <TrendingUp className="mr-2 text-blue-600" />
+              System-Wide Bias Metrics (Last 30 Days)
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="border rounded p-4">
+                <div className="text-sm text-gray-600">White Male</div>
+                <div className="text-2xl font-bold text-green-600">98.2%</div>
+                <div className="text-xs text-gray-500">Accuracy Rate</div>
+              </div>
+              <div className="border rounded p-4">
+                <div className="text-sm text-gray-600">White Female</div>
+                <div className="text-2xl font-bold text-green-600">96.8%</div>
+                <div className="text-xs text-gray-500">Accuracy Rate</div>
+              </div>
+              <div className="border rounded p-4">
+                <div className="text-sm text-gray-600">Black Male</div>
+                <div className="text-2xl font-bold text-orange-600">78.4%</div>
+                <div className="text-xs text-gray-500">Accuracy Rate</div>
+              </div>
+              <div className="border rounded p-4">
+                <div className="text-sm text-gray-600">Black Female</div>
+                <div className="text-2xl font-bold text-red-600">68.9%</div>
+                <div className="text-xs text-gray-500">Accuracy Rate</div>
+              </div>
+            </div>
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <div className="flex items-start">
+                <AlertCircle
+                  className="text-yellow-600 mr-2 flex-shrink-0 mt-1"
+                  size={20}
+                />
+                <div className="text-sm">
+                  <strong>Bias Alert:</strong> Significant accuracy disparity
+                  detected. Black female demographic shows 29.3% lower accuracy
+                  compared to white male baseline. Enhanced human review
+                  protocols activated.
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+        const MatchReviewCard = () => (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div className="flex justify-between items-start mb-4">
+              <h2 className="text-xl font-bold flex items-center">
+                <User className="mr-2 text-blue-600" />
+                Match Review Required
+              </h2>
+              {currentMatch.requiresReview && (
+                <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
+                  High Priority
+                </span>
+              )}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <h3 className="font-semibold mb-3">Match Details</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="text-gray-600">Match ID:</span>
+                    <span className="font-semibold">
+                      #{currentMatch.id}-2026-
+                      {String(currentMatch.id).padStart(4, "0")}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="text-gray-600">Timestamp:</span>
+                    <span className="font-semibold">
+                      {currentMatch.timestamp}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="text-gray-600">Confidence Score:</span>
+                    <span
+                      className={`font-bold ${
+                        currentMatch.confidence > 90
+                          ? "text-green-600"
+                          : "text-orange-600"
+                      }`}
+                    >
+                      {currentMatch.confidence}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="text-gray-600">Demographic Group:</span>
+                    <span className="font-semibold">
+                      {currentMatch.demographic}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="text-gray-600">Historical Accuracy:</span>
+                    <span
+                      className={`font-bold ${
+                        currentMatch.historicalAccuracy > 90
+                          ? "text-green-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {currentMatch.historicalAccuracy}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b">
+                    <span className="text-gray-600">Bias Risk Level:</span>
+                    <span
+                      className={`font-bold ${
+                        currentMatch.biasRisk === "High"
+                          ? "text-red-600"
+                          : "text-green-600"
+                      }`}
+                    >
+                      {currentMatch.biasRisk}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-3">Risk Assessment</h3>
+                <div className="bg-red-50 border border-red-200 rounded p-4 mb-4">
+                  <div className="flex items-start">
+                    <AlertCircle
+                      className="text-red-600 mr-2 flex-shrink-0 mt-1"
+                      size={20}
+                    />
+                    <div className="text-sm">
+                      <strong>Elevated Bias Risk:</strong> This match involves a
+                      demographic group with historically lower accuracy rates.
+                      System confidence may be overstated. Enhanced scrutiny
+                      recommended.
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center">
+                    <div className="w-32 text-gray-600">System Bias Risk:</div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2 ml-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          currentMatch.biasRisk === "High"
+                            ? "bg-red-600"
+                            : "bg-green-600"
+                        }`}
+                        style={{
+                          width:
+                            currentMatch.biasRisk === "High" ? "85%" : "25%",
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-32 text-gray-600">Feature Quality:</div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2 ml-2">
+                      <div
+                        className="bg-yellow-600 h-2 rounded-full"
+                        style={{ width: "72%" }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="w-32 text-gray-600">Database Match:</div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2 ml-2">
+                      <div
+                        className="bg-orange-600 h-2 rounded-full"
+                        style={{ width: `${currentMatch.confidence}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowExplanation(!showExplanation)}
+              className="w-full mb-4 py-2 px-4 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 flex items-center justify-center font-semibold"
+            >
+              <Info className="mr-2" size={18} />
+              {showExplanation ? "Hide" : "Show"} AI Decision Explanation
+            </button>
+
+            {showExplanation && (
+              <div className="bg-blue-50 border border-blue-200 rounded p-4 mb-4">
+                <h4 className="font-semibold mb-2">
+                  How This Decision Was Made:
+                </h4>
+                <div className="text-sm space-y-2">
+                  <p>
+                    <strong>Features Analyzed:</strong>
+                  </p>
+                  <ul className="list-disc list-inside ml-2 space-y-1">
+                    {currentMatch.features.map((feature, idx) => (
+                      <li key={idx}>
+                        {feature.replace("_", " ")}: Match strength 78-92%
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-3">
+                    <strong>Algorithm Used:</strong> Ensemble CNN Model v3.2.1
+                  </p>
+                  <p>
+                    <strong>Database:</strong> National Criminal Database (Last
+                    updated: Jan 2026)
+                  </p>
+                  <p>
+                    <strong>Lighting Conditions:</strong> Adequate (ISO 400)
+                  </p>
+                  <p className="text-red-600 font-semibold mt-3">
+                    ⚠️ Note: System has {100 - currentMatch.historicalAccuracy}%
+                    historical false positive rate for this demographic group.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="border-t pt-4">
+              <h3 className="font-semibold mb-3">Human Decision Required</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                As the human operator, you have final authority over this
+                decision. The AI serves as an assistant, but you maintain full
+                control.
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <button
+                  onClick={() => setUserDecision("approve")}
+                  className={`py-3 px-4 rounded font-semibold flex items-center justify-center ${
+                    userDecision === "approve"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-green-100"
+                  }`}
+                >
+                  <CheckCircle className="mr-2" size={20} />
+                  Approve Match
+                </button>
+                <button
+                  onClick={() => setUserDecision("reject")}
+                  className={`py-3 px-4 rounded font-semibold flex items-center justify-center ${
+                    userDecision === "reject"
+                      ? "bg-red-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-red-100"
+                  }`}
+                >
+                  <XCircle className="mr-2" size={20} />
+                  Reject Match
+                </button>
+              </div>
+
+              {userDecision && (
+                <div className="mt-4">
+                  <label className="block text-sm font-semibold mb-2">
+                    Reason for{" "}
+                    {userDecision === "approve" ? "Approval" : "Rejection"}{" "}
+                    (Required):
+                  </label>
+                  <textarea
+                    value={overrideReason}
+                    onChange={(e) => setOverrideReason(e.target.value)}
+                    className="w-full p-3 border rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    rows="3"
+                    placeholder="Provide detailed justification for your decision. This will be logged for accountability and bias monitoring."
+                  />
+                  <button
+                    onClick={() => setFeedbackSubmitted(true)}
+                    disabled={!overrideReason.trim()}
+                    className="mt-2 w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed font-semibold"
+                  >
+                    Submit Decision
+                  </button>
+                </div>
+              )}
+
+              {feedbackSubmitted && (
+                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded">
+                  <div className="flex items-start">
+                    <CheckCircle className="text-green-600 mr-2 flex-shrink-0 mt-1" />
+                    <div className="text-sm">
+                      <strong>Decision Recorded:</strong> Your {userDecision}{" "}
+                      decision has been logged. This feedback will be used to
+                      improve the system's accuracy for{" "}
+                      {currentMatch.demographic} demographic group. Case
+                      escalated to supervisor for secondary review due to high
+                      bias risk.
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+        const PrivacyControls = () => (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-bold mb-4 flex items-center">
+              <Shield className="mr-2 text-purple-600" />
+              Privacy & Ethical Controls
+            </h2>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-3 border rounded">
+                <div className="flex items-center">
+                  <Eye className="mr-3 text-gray-600" />
+                  <div>
+                    <div className="font-semibold text-sm">
+                      Audit Log Active
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      All decisions are logged for accountability
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-semibold">
+                  ENABLED
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 border rounded">
+                <div className="flex items-center">
+                  <Activity className="mr-3 text-gray-600" />
+                  <div>
+                    <div className="font-semibold text-sm">
+                      Real-time Bias Monitoring
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      Continuous demographic performance tracking
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-semibold">
+                  ENABLED
+                </div>
+              </div>
+              <div className="flex items-center justify-between p-3 border rounded">
+                <div className="flex items-center">
+                  <User className="mr-3 text-gray-600" />
+                  <div>
+                    <div className="font-semibold text-sm">
+                      Subject Notification
+                    </div>
+                    <div className="text-xs text-gray-600">
+                      Individuals notified when flagged
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-green-100 text-green-800 px-3 py-1 rounded text-xs font-semibold">
+                  ENABLED
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+        return (
+          <div className="min-h-screen bg-gray-100 p-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg shadow-lg p-6 mb-6">
+                <h1 className="text-3xl font-bold mb-2">
+                  Facial Recognition Oversight Dashboard
+                </h1>
+                <p className="text-blue-100">
+                  Human-Centered AI System with Bias Mitigation & Transparency
+                </p>
+              </div>
+
+              <BiasMetrics />
+              <MatchReviewCard />
+              <PrivacyControls />
+
+              <div className="mt-6 p-4 bg-white rounded-lg shadow text-sm text-gray-600">
+                <strong>System Design Principles:</strong> This dashboard
+                embodies HCAI values by maintaining human authority over all
+                decisions, providing transparent explanations of AI reasoning,
+                highlighting bias risks prominently, enabling easy feedback
+                submission, and implementing comprehensive accountability
+                measures. All decisions are auditable and contribute to ongoing
+                bias reduction efforts.
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      ReactDOM.render(
+        <FRSOversightDashboard />,
+        document.getElementById("root")
+      );
+    </script>
+  </body>
+</html>
